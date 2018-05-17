@@ -1,9 +1,9 @@
 import argparse
-import torch as th
+import torch
 import json
 import random
 from pprint import pprint
-from utils.misc import mkdir
+from utils.misc import mkdirs
 
 # always uses cuda if avaliable
 
@@ -54,7 +54,9 @@ class Parser(argparse.ArgumentParser):
                 args.init_features, args.drop_rate, args.batch_size, 
                 args.lr, args.weight_decay, args.epochs
             )
-       
+        args.ckpt_dir = args.run_dir + '/checkpoints'
+        mkdirs([args.run_dir, args.ckpt_dir])
+
         assert args.epochs % args.ckpt_freq == 0, 'epochs must'\
             'be dividable by ckpt_freq'
 
@@ -63,13 +65,17 @@ class Parser(argparse.ArgumentParser):
             args.seed = random.randint(1, 10000)
         print("Random Seed: ", args.seed)
         random.seed(args.seed)
-        th.manual_seed(args.seed)
+        torch.manual_seed(args.seed)
 
         print('Arguments:')
         pprint(vars(args))
 
-        mkdir(args.run_dir)
-        with open(args.run_dir + "/args.txt", 'w') as args_file:
-            json.dump(vars(args), args_file, indent=4)
+        if not args.post:
+            with open(args.run_dir + "/args.txt", 'w') as args_file:
+                json.dump(vars(args), args_file, indent=4)
 
         return args
+
+# global
+args = Parser().parse()
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")

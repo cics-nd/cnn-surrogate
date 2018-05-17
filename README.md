@@ -20,8 +20,10 @@ The four rows in each image from top to bottom show: (1) simulator output,
 
 ## Dependencies
 - python 3 or 2
-- PyTorch 0.3.1
+- PyTorch 0.4
 - h5py
+- matplotlib
+- seaborn
 
 
 ## Installation
@@ -33,11 +35,12 @@ git clone https://github.com/cics-nd/cnn-surrogate.git
 cd cnn-surrogate
 ```
 
+
 ## Dataset
 Download Darcy flow simulation dataset with input Gaussian random field (with 
 exponential kernel) and three output fields (pressure and velocities fields).
 
-To download KLE4225 dataset, 
+Download KLE4225 dataset:
 ```bash
 bash ./scripts/download_dataset.sh 4225
 ```
@@ -56,18 +59,49 @@ KLE4225 | KLE500 | KLE50
 :-----:|:------:|:-----:
 ![](images/kle4225_data_312.png?raw=true) | ![](images/kle500_data_293.png?raw=true) | ![](images/kle50_data_47.png?raw=true)
 
+
+
+## Start with a Pre-trained Model
+
+Download a pre-trained model:
+```bash
+bash ./scripts/download_checkpoints.sh 4225 256
+```
+where 4225 and 256 refer to the intrinsic input dimensionality of dataset and
+number of training data. The pre-trained model is downloaded to the same location (`./experiments/Bayesian/*/`) as if it was trained on local machines. You may proceed to use the pre-trained model for UQ tasks.
+
+## Uncertainty Quantification (UQ)
+Perform UQ tasks, including:
+
+- Prediction at one input realization
+- Uncertainty propagation
+- Distribution estimate
+- Uncertainty quality assessment (realiability diagram)
+```
+python post_proc.py --post --kle 4225 --ntrain 256
+```
+Do not forget to add the `--post` switch. For KLE4225 with 128 data, `--epochs` should be set to 400 to show convergence.
+
+
 ## Training
 
 ### Deterministic Surrogate 
 
-Training non-Bayesian surroagte (e.g. with 512 data from KLE4225 dataset):
+Train a non-Bayesian surroagte (e.g. with 256 data from KLE4225 dataset):
 ```
-python train_det.py --kle 4225 --ntrain 512
+python train_det.py --kle 4225 --ntrain 256
 ```
-The runs are saved at `./experiments/`.
+The runs are saved at `./experiments/deterministic`.
 
-### Bayesian Surrogate: coming soon...
-
+### Bayesian Surrogate
+Train a Bayesian surrogate (e.g. with 256 data from KLE4225 dataset
+using SVGD with 20 samples):
+```
+python train_svgd.py --kle 4225 --ntrain 256 --n-samples 20
+```
+The runs are saved at `./experiments/Bayesian`.
+It takes 1-2 hours to train a Bayesian surrogate with 256-512 training data 
+(20 samples, 300 epochs, batch-size 16) on a single GPU.
 
 ## Citation
 

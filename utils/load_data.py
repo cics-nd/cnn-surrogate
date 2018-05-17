@@ -1,8 +1,7 @@
-import torch as th
+import torch
 import numpy as np
 import h5py
 from torch.utils.data import DataLoader, TensorDataset
-from time import time
 
 
 def load_data(data_dir, batch_size):
@@ -24,9 +23,9 @@ def load_data(data_dir, batch_size):
     print("output data shape: {}".format(y_data.shape))
 
     kwargs = {'num_workers': 4,
-              'pin_memory': True} if th.cuda.is_available() else {}
+              'pin_memory': True} if torch.cuda.is_available() else {}
 
-    dataset = TensorDataset(th.FloatTensor(x_data), th.FloatTensor(y_data))
+    dataset = TensorDataset(torch.tensor(x_data), torch.tensor(y_data))
     data_loader = DataLoader(dataset, batch_size=batch_size, shuffle=True, **kwargs)
 
     # simple statistics of output data

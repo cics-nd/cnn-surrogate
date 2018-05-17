@@ -292,6 +292,6 @@ if __name__ == '__main__':
                       init_features=48, drop_rate=0, bn_size=8, 
                       bottleneck=False, out_activation='Tanh')
     print(dense_ed)
-    x = torch.autograd.Variable(torch.Tensor(16, 1, 65, 65))
+    x = torch.Tensor(16, 1, 65, 65)
     dense_ed.forward_test(x)
     print(dense_ed._num_parameters_convlayers())

@@ -165,7 +165,7 @@ class BayesNN(nn.Module):
                 torch.log1p(0.5 / self.w_prior_rate * param.pow(2)).sum()
         log_prob_prior_w *= -(self.w_prior_shape + 0.5)
         # log prob of prior of log noise-precision (NOT noise precision)
-        log_prob_prior_log_beta = (self.beta_prior_shape * self.nnets[index].log_beta \
+        log_prob_prior_log_beta = ((self.beta_prior_shape-1.0) * self.nnets[index].log_beta \
                     - self.nnets[index].log_beta.exp() * self.beta_prior_rate)
         return log_likelihood + log_prob_prior_w + log_prob_prior_log_beta
 
